@@ -756,7 +756,7 @@ body.modal-open { overflow: hidden; }
 /* Abas de ordenação — mesmo formato das .chip do tema */
 .reelix-explore .reelix-tabs {
 	display: flex; flex-wrap: wrap; gap: 8px;
-	margin: 14px 0 18px; padding: 0;
+	margin: 16px 0 20px; padding: 0;
 	border: 0; background: none;
 }
 .reelix-explore .reelix-tabs__item {
@@ -772,6 +772,7 @@ body.modal-open { overflow: hidden; }
 .reelix-explore .reelix-tabs__item.is-active {
 	background: var(--accent); border-color: var(--accent);
 	color: var(--accent-text); font-weight: 700;
+	box-shadow: 0 2px 10px color-mix(in srgb, var(--accent), transparent 72%);
 }
 
 /* Estado vazio com a mesma voz visual do tema */

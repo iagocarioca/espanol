@@ -343,3 +343,49 @@ function espanol_page_url_by_template( $template ) {
 	);
 	return $pages ? get_permalink( $pages[0] ) : '#';
 }
+
+/**
+ * Traduz para espanhol as strings do plugin Reelix, que vem em portugues.
+ *
+ * Feito por filtro no tema (e nao editando o plugin) para sobreviver as
+ * atualizacoes dele. Só atua no text domain "reelix".
+ *
+ * @param string $traduzido Texto ja traduzido pelo WordPress.
+ * @param string $original  Texto original do plugin.
+ * @param string $dominio   Text domain da string.
+ * @return string
+ */
+function espanol_reelix_es( $traduzido, $original, $dominio ) {
+	if ( 'reelix' !== $dominio ) {
+		return $traduzido;
+	}
+
+	$mapa = array(
+		'Recentes'                    => 'Recientes',
+		'Mais vistos'                 => 'Más vistos',
+		'Mais curtidos'               => 'Más gustados',
+		'Aleatório'                   => 'Aleatorio',
+		'Explorar'                    => 'Explorar',
+		'Ordenar'                     => 'Ordenar',
+		'Curtir'                      => 'Me gusta',
+		'Você chegou ao fim.'         => 'Has llegado al final.',
+		'Nenhum short por aqui ainda.' => 'Aún no hay shorts publicados.',
+	);
+
+	return isset( $mapa[ $original ] ) ? $mapa[ $original ] : $traduzido;
+}
+add_filter( 'gettext', 'espanol_reelix_es', 10, 3 );
+
+/**
+ * Mesma traducao para strings com contexto (assinatura de 4 argumentos).
+ *
+ * @param string $traduzido Texto ja traduzido.
+ * @param string $original  Texto original.
+ * @param string $contexto  Contexto da string.
+ * @param string $dominio   Text domain.
+ * @return string
+ */
+function espanol_reelix_es_ctx( $traduzido, $original, $contexto, $dominio ) {
+	return espanol_reelix_es( $traduzido, $original, $dominio );
+}
+add_filter( 'gettext_with_context', 'espanol_reelix_es_ctx', 10, 4 );
