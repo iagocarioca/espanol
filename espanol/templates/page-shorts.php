@@ -10,13 +10,46 @@
  */
 
 get_header();
+
+$espanol_reelix = class_exists( '\Reelix\Frontend\Explore' );
+
+// Contagem de shorts publicados, para o subtítulo do cabeçalho.
+$espanol_total = 0;
+if ( $espanol_reelix ) {
+	$espanol_count = wp_count_posts( 'reelix_short' );
+	$espanol_total = $espanol_count ? (int) $espanol_count->publish : 0;
+}
 ?>
 
-<h1 class="page-heading"><?php espanol_the_icon( 'shorts' ); ?> <?php esc_html_e( 'Shorts & Clips', 'espanol' ); ?></h1>
+<header class="page-head">
+	<h1 class="page-heading"><?php espanol_the_icon( 'shorts' ); ?> <?php esc_html_e( 'Shorts &amp; Clips', 'espanol' ); ?></h1>
+
+	<?php if ( $espanol_total > 0 ) : ?>
+		<p class="page-subheading">
+			<?php
+			printf(
+				/* translators: %s: número de shorts publicados. */
+				esc_html( _n( '%s short para ver ahora', '%s shorts para ver ahora', $espanol_total, 'espanol' ) ),
+				'<b>' . esc_html( number_format_i18n( $espanol_total ) ) . '</b>'
+			);
+			?>
+		</p>
+	<?php endif; ?>
+</header>
 
 <?php
-if ( class_exists( '\Reelix\Frontend\Explore' ) ) :
-	// O título já vem do cabeçalho da página, por isso title="no".
+// Conteúdo editado na própria página (opcional, acima da grade).
+while ( have_posts() ) :
+	the_post();
+	$espanol_intro = trim( get_the_content() );
+	if ( '' !== $espanol_intro ) {
+		echo '<div class="page-body page-intro">' . wp_kses_post( apply_filters( 'the_content', $espanol_intro ) ) . '</div>';
+	}
+endwhile;
+wp_reset_postdata();
+
+if ( $espanol_reelix ) :
+	// O cabeçalho acima já anuncia a seção, por isso title="no".
 	echo do_shortcode( '[reelix_explore title="no"]' );
 else :
 	// Fallback: shorts publicados como posts do próprio tema.
