@@ -757,8 +757,8 @@ body.modal-open { overflow: hidden; }
 /* ---------- Grade de Shorts do Reelix ---------- */
 /*
  * O plugin desenha as pills a partir de custom properties, cada uma com
- * fallback proprio (o verde #6fab0d que vinha de fabrica). Entao aqui so
- * redefinimos os tokens em vez de brigar com as regras dele.
+ * fallback proprio (o verde #6fab0d de fabrica). Entao aqui so redefinimos
+ * os tokens em vez de brigar com as regras dele.
  *
  * As variaveis chegam inline no seletor `.reelix-explore,.reelix-shelf`
  * (especificidade 0,1,0); repetir a classe eleva para 0,2,0 e vence sem
@@ -771,8 +771,8 @@ body.modal-open { overflow: hidden; }
 	--reelix-accent: var(--accent);
 	--reelix-tab-active: var(--accent);
 	--reelix-tab-active-text: var(--accent-text);
-	--reelix-tab-bg: #141414;
-	--reelix-tab-text: var(--text);
+	--reelix-tab-bg: var(--surface);
+	--reelix-tab-text: var(--muted);
 	--reelix-tab-border: var(--border);
 	--reelix-tab-radius: 999px;
 }
@@ -784,22 +784,54 @@ body.scheme-light .reelix-explore.reelix-explore {
 /* O <h1> da pagina ja anuncia a secao; o titulo do plugin sairia duplicado. */
 .reelix-explore__head { display: none; }
 
-/* A nav do plugin centraliza com max-width propria; aqui ela acompanha
-   a largura do conteudo do tema, alinhada a esquerda como o resto. */
-.reelix-explore .reelix-tabs {
-	max-width: none; margin: 16px 0 20px; padding: 0 0 2px;
+/*
+ * Alinhamento lateral.
+ *
+ * O plugin centraliza a grade em max-width 1220px com margin auto, enquanto
+ * o tema usa .container (max-width 1320px + padding 16px). A diferenca de
+ * ~50px por lado deixava a grade deslocada em relacao ao titulo. Aqui a nav
+ * e a grade passam a ocupar a largura do conteudo do tema, alinhadas a
+ * esquerda como o resto da pagina.
+ */
+.reelix-explore .reelix-tabs,
+.reelix-explore .reelix-grid {
+	max-width: none;
+	margin-left: 0; margin-right: 0;
+	padding-left: 0; padding-right: 0;
 }
 
+.reelix-explore .reelix-tabs {
+	gap: 8px; margin: 18px 0 20px; padding-bottom: 2px;
+}
+
+/* Pills no vocabulario do tema: pilula, borda sutil, texto apagado ate o hover. */
 .reelix-explore .reelix-tabs__item {
 	opacity: 1;
-	font-size: 13px; font-weight: 600;
-	padding: 7px 16px;
-	transition: background .18s, border-color .18s, color .18s;
+	font-size: 13px; font-weight: 600; letter-spacing: .1px;
+	padding: 8px 17px;
+	transition: background .18s, border-color .18s, color .18s, transform .15s;
 }
 
+.reelix-explore .reelix-tabs__item:hover {
+	background: var(--surface-2);
+	border-color: color-mix(in srgb, var(--accent), transparent 55%);
+	color: var(--text);
+}
+
+/*
+ * Aba ativa com a mesma assinatura dos CTAs do tema (.btn-cta): gradiente
+ * vertical no accent, sombra colorida e brilho interno no topo.
+ */
 .reelix-explore .reelix-tabs__item.is-active {
-	font-weight: 700;
-	box-shadow: 0 2px 10px color-mix(in srgb, var(--accent), transparent 72%);
+	background: var(--accent);
+	background: linear-gradient(to top, color-mix(in srgb, var(--accent), #000 28%) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent), #fff 18%) 100%);
+	border-color: transparent;
+	color: var(--accent-text); font-weight: 700;
+	box-shadow: 0 4px 16px color-mix(in srgb, var(--accent), transparent 65%), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.reelix-explore .reelix-tabs__item.is-active:hover {
+	filter: brightness(1.08); transform: translateY(-1px);
+	color: var(--accent-text);
 }
 
 /* Estado vazio na mesma voz visual das outras paginas do tema. */
@@ -809,6 +841,7 @@ body.scheme-light .reelix-explore.reelix-explore {
 }
 
 @media (max-width: 720px) {
-	.reelix-explore .reelix-tabs { margin: 12px 0 14px; gap: 6px; }
-	.reelix-explore .reelix-tabs__item { padding: 6px 13px; font-size: 12.5px; }
+	/* Pills correm ate a borda da tela, mas comecam alinhadas ao titulo. */
+	.reelix-explore .reelix-tabs { margin: 14px 0 16px; gap: 6px; }
+	.reelix-explore .reelix-tabs__item { padding: 7px 14px; font-size: 12.5px; }
 }
