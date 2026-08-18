@@ -1,0 +1,46 @@
+name: Deploy tema para o WordPress
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-wordpress
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Enviar tema via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o repositorio
+        uses: actions/checkout@v4
+
+      - name: Validar sintaxe PHP
+        run: |
+          find espanol -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Enviar arquivos para o servidor
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          port: ${{ secrets.FTP_PORT }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: ./espanol/
+          server-dir: ${{ secrets.FTP_REMOTE_DIR }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/.distignore
+            **/.gitignore
+            **/README.md
+            **/*.map
+            **/.DS_Store
+            **/Thumbs.db

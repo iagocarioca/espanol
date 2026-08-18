@@ -1,0 +1,27 @@
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+
+# Dependencias / build
+node_modules/
+vendor/
+*.log
+
+# Credenciais - NUNCA versionar
+.env
+.env.*
+*.pem
+*.key
+wp-config.php
+ftp-config*
+deploy-config*
+
+# Claude Code local
+.claude/
