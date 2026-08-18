@@ -14,6 +14,7 @@ jobs:
   deploy:
     name: Enviar tema via FTP
     runs-on: ubuntu-latest
+    environment: espanol
 
     steps:
       - name: Baixar o repositorio
@@ -22,6 +23,14 @@ jobs:
       - name: Validar sintaxe PHP
         run: |
           find espanol -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Verificar secrets
+        run: |
+          [ -n "${{ secrets.FTP_SERVER }}" ] && echo "FTP_SERVER: OK" || echo "FTP_SERVER: VAZIO"
+          [ -n "${{ secrets.FTP_PORT }}" ] && echo "FTP_PORT: OK" || echo "FTP_PORT: VAZIO"
+          [ -n "${{ secrets.FTP_USERNAME }}" ] && echo "FTP_USERNAME: OK" || echo "FTP_USERNAME: VAZIO"
+          [ -n "${{ secrets.FTP_PASSWORD }}" ] && echo "FTP_PASSWORD: OK" || echo "FTP_PASSWORD: VAZIO"
+          [ -n "${{ secrets.FTP_REMOTE_DIR }}" ] && echo "FTP_REMOTE_DIR: OK" || echo "FTP_REMOTE_DIR: VAZIO"
 
       - name: Enviar arquivos para o servidor
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
