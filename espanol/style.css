@@ -743,3 +743,58 @@ body.modal-open { overflow: hidden; }
 	.vc-meta { gap: 8px; font-size: 10.5px; }
 	.vc-title { font-size: 13px; }
 }
+
+/* ---------- Grade de Shorts (plugin Reelix) ---------- */
+/* Alinha a grade do plugin ao design do tema: pílulas iguais às .chip,
+   destaque em --accent e suporte ao tema claro. */
+
+.reelix-explore { margin-top: 4px; }
+
+/* O título vem do .page-heading do tema; o do plugin fica oculto. */
+.reelix-explore__head { display: none; }
+
+/* Abas de ordenação — mesmo formato das .chip do tema */
+.reelix-explore .reelix-tabs {
+	display: flex; flex-wrap: wrap; gap: 8px;
+	margin: 14px 0 18px; padding: 0;
+	border: 0; background: none;
+}
+.reelix-explore .reelix-tabs__item {
+	display: inline-flex; align-items: center;
+	background: #141414; border: 1px solid var(--border);
+	border-radius: 999px; padding: 7px 16px;
+	font-size: 13px; font-weight: 600; color: var(--text);
+	white-space: nowrap; transition: border-color .18s, color .18s, background .18s;
+}
+.reelix-explore .reelix-tabs__item:hover {
+	border-color: var(--accent); color: var(--accent);
+}
+.reelix-explore .reelix-tabs__item.is-active {
+	background: var(--accent); border-color: var(--accent);
+	color: var(--accent-text); font-weight: 700;
+}
+
+/* Estado vazio com a mesma voz visual do tema */
+.reelix-explore__empty {
+	color: var(--muted); font-size: 14px;
+	padding: 28px 0; text-align: center;
+}
+
+/* Tema claro */
+body.scheme-light .reelix-explore .reelix-tabs__item {
+	background: #ffffff;
+}
+body.scheme-light .reelix-explore .reelix-tabs__item.is-active {
+	background: var(--accent); color: var(--accent-text);
+}
+
+@media (max-width: 720px) {
+	/* Abas roláveis na horizontal, sem quebrar linha */
+	.reelix-explore .reelix-tabs {
+		flex-wrap: nowrap; overflow-x: auto; gap: 6px;
+		margin: 12px 0 14px; padding-bottom: 4px;
+		scrollbar-width: none; -webkit-overflow-scrolling: touch;
+	}
+	.reelix-explore .reelix-tabs::-webkit-scrollbar { display: none; }
+	.reelix-explore .reelix-tabs__item { padding: 6px 13px; font-size: 12.5px; }
+}
