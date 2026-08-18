@@ -31,6 +31,8 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
+          dry-run: true
+          log-level: verbose
           local-dir: ./espanol/
           server-dir: ${{ secrets.FTP_REMOTE_DIR }}
           exclude: |
