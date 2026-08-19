@@ -745,11 +745,12 @@ body.modal-open { overflow: hidden; }
 }
 
 /* ---------- Cabeçalho de página (título + subtítulo) ---------- */
-.page-head { margin: 22px 0 4px; }
-.page-head .page-heading { margin: 0; }
+.page-head { margin: 26px 0 2px; }
+.page-head .page-heading { margin: 0; font-size: 22px; letter-spacing: -.2px; }
+.page-head .page-heading svg { width: 20px; height: 20px; }
 .page-subheading {
-	color: var(--muted); font-size: 13.5px;
-	margin: 6px 0 0; letter-spacing: .1px;
+	color: var(--muted); font-size: 13px;
+	margin: 7px 0 0; letter-spacing: .1px;
 }
 .page-subheading b { color: var(--text); font-weight: 700; }
 .page-intro { margin: 12px 0 2px; }
@@ -793,11 +794,20 @@ body.scheme-light .reelix-explore.reelix-explore {
  * e a grade passam a ocupar a largura do conteudo do tema, alinhadas a
  * esquerda como o resto da pagina.
  */
-.reelix-explore .reelix-tabs,
-.reelix-explore .reelix-grid {
+.reelix-explore.reelix-explore .reelix-tabs,
+.reelix-explore.reelix-explore .reelix-grid {
 	max-width: none;
 	margin-left: 0; margin-right: 0;
 	padding-left: 0; padding-right: 0;
+}
+
+/* O plugin redeclara max-width nos breakpoints (768px e 1400px);
+   sem repetir aqui, a grade voltava a centralizar no desktop. */
+@media (min-width: 768px) {
+	.reelix-explore.reelix-explore .reelix-grid { max-width: none; }
+}
+@media (min-width: 1400px) {
+	.reelix-explore.reelix-explore .reelix-grid { max-width: none; }
 }
 
 .reelix-explore .reelix-tabs {
