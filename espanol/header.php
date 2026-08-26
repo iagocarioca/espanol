@@ -13,6 +13,7 @@ $espanol_stats = espanol_get_option( 'stats_text', 'Más de <span class="num">42
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="rating" content="adult">
+<meta name="google-site-verification" content="vhSOpkesDkXDHdN9GcdEjkzkDf82dXw-bH1shyu7g5Q" />
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
