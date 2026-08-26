@@ -390,3 +390,18 @@ function espanol_reelix_es_ctx( $traduzido, $original, $contexto, $dominio ) {
 	return espanol_reelix_es( $traduzido, $original, $dominio );
 }
 add_filter( 'gettext_with_context', 'espanol_reelix_es_ctx', 10, 4 );
+
+/**
+ * Forca o navegador a trocar http:// por https:// em qualquer recurso
+ * carregado na pagina (imagens, iframes, scripts), mesmo os que vem de
+ * fora do controle do tema — como o poster de um iframe de terceiros
+ * (ex.: plugins de player que embutem CDN externo em http).
+ *
+ * upgrade-insecure-requests e suportado por todos os navegadores atuais
+ * e nao quebra nada: se o recurso tambem existir em https (caso comum
+ * de CDNs), ele so passa a carregar pela versao segura.
+ */
+function espanol_upgrade_insecure_requests() {
+	echo '<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">' . "\n";
+}
+add_action( 'wp_head', 'espanol_upgrade_insecure_requests', 1 );
