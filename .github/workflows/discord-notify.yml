@@ -1,0 +1,129 @@
+name: Discord Deploy Notifications
+
+on:
+  workflow_run:
+    workflows: ["Deploy tema para o WordPress"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+
+    steps:
+      - name: Determine deploy status and context
+        id: deploy-context
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "status=manual" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "run_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+            echo "branch=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "actor=${{ github.actor }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            echo "status=success" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+            echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+            echo "branch=${{ github.event.workflow_run.head_branch }}" >> "$GITHUB_OUTPUT"
+            echo "actor=${{ github.event.workflow_run.actor.login || github.actor }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=failure" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+            echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+            echo "branch=${{ github.event.workflow_run.head_branch }}" >> "$GITHUB_OUTPUT"
+            echo "actor=${{ github.event.workflow_run.actor.login || github.actor }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.deploy-context.outputs.sha }}
+
+      - name: Extract theme version
+        id: extract-info
+        shell: bash
+        run: |
+          version=$(node .github/scripts/extract-version.js)
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Version: $version"
+
+      - name: Generate Discord payload
+        run: |
+          node .github/scripts/generate-changelog-discord.js \
+            "${{ steps.extract-info.outputs.version }}" \
+            "${{ steps.deploy-context.outputs.status }}" \
+            "${{ github.server_url }}" \
+            "${{ github.repository }}" \
+            "${{ steps.deploy-context.outputs.sha }}" \
+            "${{ steps.deploy-context.outputs.run_id }}" \
+            "${{ steps.deploy-context.outputs.actor }}" \
+            "${{ steps.deploy-context.outputs.branch }}"
+        env:
+          DISCORD_PAYLOAD_FILE: discord_payload.json
+
+      - name: Validate Discord payload
+        run: |
+          if [ ! -f discord_payload.json ]; then
+            echo "Arquivo discord_payload.json não encontrado"
+            exit 1
+          fi
+
+          node -e "
+            const payload = JSON.parse(require('fs').readFileSync('discord_payload.json', 'utf8'));
+
+            if (!payload.content) {
+              console.error('Payload inválido: content ausente');
+              process.exit(1);
+            }
+
+            if (!payload.embeds || !Array.isArray(payload.embeds) || payload.embeds.length === 0) {
+              console.error('Payload inválido: embeds ausentes');
+              process.exit(1);
+            }
+
+            const embed = payload.embeds[0];
+            const totalSize = (payload.content?.length || 0) + (embed.title?.length || 0) + (embed.description?.length || 0)
+              + (embed.fields || []).reduce((sum, field) => sum + (field.name?.length || 0) + (field.value?.length || 0), 0);
+
+            console.log('Payload válido');
+            console.log('Content:', payload.content);
+            console.log('Título:', embed.title);
+            console.log('Campos:', embed.fields?.length);
+            console.log('Tamanho total:', totalSize, '/ 6000');
+
+            if (totalSize > 6000) {
+              console.error('Embed excede 6000 caracteres (' + totalSize + ')');
+              process.exit(1);
+            }
+          "
+
+      - name: Send Discord notification
+        shell: bash
+        run: |
+          http_status=$(curl -s -o /tmp/discord_response.txt -w "%{http_code}" \
+            -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @discord_payload.json)
+
+          body=$(cat /tmp/discord_response.txt)
+
+          echo "HTTP status: $http_status"
+          echo "Resposta: $body"
+
+          if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
+            echo "Discord retornou erro HTTP $http_status"
+            echo "Corpo: $body"
+            exit 1
+          fi
+
+          echo "Notificação enviada com sucesso"
+        env:
+          # Webhook fixo — sempre o mesmo em todos os projetos. Mantenha hardcoded.
+          DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1506289884082602136/gznP0ePwYtRI-Fbcj3aZFayz86W98XTxfnAgXN9xP1Gubbx1lrT0fmaMYz5XlWHqyKKW"
