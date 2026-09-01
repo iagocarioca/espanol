@@ -19,6 +19,8 @@ $espanol_stats = espanol_get_option( 'stats_text', 'Más de <span class="num">42
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+<?php get_template_part( 'template-parts/age-gate' ); ?>
+
 <div class="offcanvas-overlay js-menu-close"></div>
 <aside class="offcanvas" aria-label="<?php esc_attr_e( 'Menú principal', 'espanol' ); ?>">
 	<div class="offcanvas-head">

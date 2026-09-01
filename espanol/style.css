@@ -855,3 +855,74 @@ body.scheme-light .reelix-explore.reelix-explore {
 	.reelix-explore .reelix-tabs { margin: 14px 0 16px; gap: 6px; }
 	.reelix-explore .reelix-tabs__item { padding: 7px 14px; font-size: 12.5px; }
 }
+
+/*
+ * Age gate — aviso de conteúdo adulto.
+ *
+ * O markup está sempre no HTML e quem decide é o JS pelo cookie, então o CSS
+ * precisa nascer escondido: sem isso o full-page cache entregaria o gate
+ * aberto por um instante para quem já aceitou.
+ */
+.age-gate { position: fixed; inset: 0; z-index: 300; display: none; }
+.age-gate.is-open {
+	display: flex; align-items: center; justify-content: center;
+	padding: 16px;
+}
+.age-gate-overlay {
+	position: absolute; inset: 0;
+	background: rgba(0, 0, 0, .72);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+}
+.age-gate-dialog {
+	position: relative; width: 100%; max-width: 520px;
+	max-height: 100%; overflow: auto;
+	background: var(--surface); border: 1px solid var(--border);
+	border-radius: 18px; padding: 26px 20px 22px;
+	box-shadow: 0 24px 64px rgba(0, 0, 0, .5);
+	display: flex; flex-direction: column; align-items: center; gap: 14px;
+	text-align: center;
+	animation: auth-pop .18s ease;
+}
+.age-gate-logo img { max-height: 56px; width: auto; }
+.age-gate-title { margin: 0; font-size: 21px; font-weight: 800; line-height: 1.2; color: var(--text); }
+.age-gate-text { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+.age-gate-text strong { color: var(--text); }
+
+.age-gate-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.age-gate-btn {
+	display: inline-flex; align-items: center; justify-content: center;
+	border-radius: 10px; padding: 13px 18px;
+	font-size: 14px; font-weight: 700; font-family: inherit;
+	transition: filter .15s, transform .15s, color .15s, border-color .15s;
+}
+.age-gate-btn.is-accept {
+	border: 0;
+	background: var(--accent);
+	background: linear-gradient(to top, color-mix(in srgb, var(--accent), #000 28%) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent), #fff 18%) 100%);
+	color: var(--accent-text); font-weight: 800; letter-spacing: .3px;
+	box-shadow: 0 4px 16px color-mix(in srgb, var(--accent), transparent 65%), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.age-gate-btn.is-accept:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.age-gate-btn.is-exit {
+	background: none; border: 1px solid var(--border); color: var(--muted);
+}
+.age-gate-btn.is-exit:hover { border-color: var(--muted); color: var(--text); }
+
+.age-gate-legal {
+	display: flex; align-items: center; justify-content: center;
+	flex-wrap: wrap; gap: 12px; margin-top: 2px;
+	color: rgba(255, 255, 255, .45);
+	font-size: 11.5px; text-transform: uppercase; letter-spacing: .5px;
+}
+.age-gate-legal .rta-icon { width: auto; height: 26px; flex-shrink: 0; }
+
+@media (min-width: 768px) {
+	.age-gate-dialog { padding: 34px 34px 28px; gap: 16px; }
+	.age-gate-logo img { max-height: 68px; }
+	.age-gate-title { font-size: 26px; }
+	.age-gate-text { font-size: 14px; }
+	/* No desktop os dois botões cabem lado a lado; o "entrar" fica à direita. */
+	.age-gate-actions { flex-direction: row-reverse; justify-content: center; }
+	.age-gate-btn { width: auto; }
+}
