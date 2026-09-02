@@ -29,6 +29,10 @@ deploy-config*
 # Plugin Reelix (versionado em repositorio proprio)
 /reelix/
 
+# Plugin ane-player (analise local, nao faz parte do tema)
+/ane-player-src/
+/ane-player.zip
+
 # Rascunhos do editor
 Untitled
 Untitled-*
