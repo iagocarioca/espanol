@@ -65,6 +65,40 @@ function espanol_duration_to_iso( $raw ) {
 }
 
 /**
+ * A URL é assinada/temporária?
+ *
+ * URLs do Aurora5 (`/secure-video/<uuid>?sig=<hmac>:<exp>`) expiram em minutos.
+ * Publicá-las como contentUrl entrega ao Googlebot um link que já morreu.
+ *
+ * @param string $url URL do vídeo.
+ * @return bool True se for temporária.
+ */
+function espanol_is_signed_url( $url ) {
+	if ( ! $url ) {
+		return false;
+	}
+
+	if ( false !== strpos( $url, '/secure-video/' ) ) {
+		return true;
+	}
+
+	$query = wp_parse_url( $url, PHP_URL_QUERY );
+	if ( ! $query ) {
+		return false;
+	}
+
+	parse_str( $query, $args );
+
+	foreach ( array( 'sig', 'signature', 'token', 'expires', 'st', 'e' ) as $key ) {
+		if ( isset( $args[ $key ] ) ) {
+			return true;
+		}
+	}
+
+	return apply_filters( 'espanol_is_signed_url', false, $url );
+}
+
+/**
  * Dados do vídeo do post atual para uso no schema.
  *
  * @param int $post_id ID do post.
@@ -124,16 +158,30 @@ function espanol_schema_video() {
 		$schema['duration'] = $data['duration'];
 	}
 
-	if ( $data['src'] ) {
+	/*
+	 * contentUrl só quando a URL for estável e publica.
+	 *
+	 * As URLs do Aurora5 sao assinadas com HMAC e expiram em ~5 min; o Googlebot
+	 * rastreia muito depois disso e receberia um link morto, o que o Search Console
+	 * penaliza. Nesse caso a URL e descartada e usamos embedUrl.
+	 */
+	if ( $data['src'] && ! espanol_is_signed_url( $data['src'] ) ) {
 		$schema['contentUrl'] = $data['src'];
 	}
 
-	// embedUrl só quando há iframe: extrai o src do código cadastrado.
-	if ( ! $data['src'] && $data['embed'] && preg_match( '/src=["\']([^"\']+)["\']/i', $data['embed'], $m ) ) {
+	// embedUrl a partir do iframe cadastrado pelo admin.
+	if ( $data['embed'] && preg_match( '/src=["\']([^"\']+)["\']/i', $data['embed'], $m ) ) {
 		$schema['embedUrl'] = $m[1];
 	}
 
-	// Sem contentUrl nem embedUrl o Google descarta o VideoObject.
+	/*
+	 * Sem nenhuma das duas, cai no embed nativo do WordPress (?embed=true):
+	 * URL permanente, publica e que renderiza o player de verdade.
+	 */
+	if ( empty( $schema['contentUrl'] ) && empty( $schema['embedUrl'] ) ) {
+		$schema['embedUrl'] = get_post_embed_url( $post_id );
+	}
+
 	if ( empty( $schema['contentUrl'] ) && empty( $schema['embedUrl'] ) ) {
 		return;
 	}
@@ -194,8 +242,9 @@ function espanol_open_graph() {
 		echo '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
 
 		if ( $is_video ) {
+			// URL assinada expira em minutos: nao serve para og:video.
 			$src = espanol_video_src( $post_id );
-			if ( $src ) {
+			if ( $src && ! espanol_is_signed_url( $src ) ) {
 				echo '<meta property="og:video" content="' . esc_url( $src ) . '">' . "\n";
 				echo '<meta property="og:video:type" content="video/mp4">' . "\n";
 			}
