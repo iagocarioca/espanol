@@ -75,6 +75,7 @@ require ESPANOL_DIR . '/inc/theme-options.php';
 require ESPANOL_DIR . '/inc/template-tags.php';
 require ESPANOL_DIR . '/inc/ajax.php';
 require ESPANOL_DIR . '/inc/rest-videos.php';
+require ESPANOL_DIR . '/inc/seo-schema.php';
 
 /**
  * Setup.
