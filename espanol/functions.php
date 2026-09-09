@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ESPANOL_VERSION', '1.3.9' );
+define( 'ESPANOL_VERSION', '1.4.0' );
 define( 'ESPANOL_DIR', get_template_directory() );
 define( 'ESPANOL_URI', get_template_directory_uri() );
 
@@ -76,6 +76,7 @@ require ESPANOL_DIR . '/inc/template-tags.php';
 require ESPANOL_DIR . '/inc/ajax.php';
 require ESPANOL_DIR . '/inc/rest-videos.php';
 require ESPANOL_DIR . '/inc/seo-schema.php';
+require ESPANOL_DIR . '/inc/seo-head.php';
 
 /**
  * Setup.

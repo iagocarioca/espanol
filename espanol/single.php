@@ -19,6 +19,8 @@ while ( have_posts() ) :
 	$espanol_percent  = espanol_like_percent( $espanol_id );
 	?>
 
+	<?php espanol_breadcrumbs(); ?>
+
 	<article class="single-video-wrap" data-video-id="<?php echo (int) $espanol_id; ?>">
 		<?php
 		// Fonte na ordem do tema-a99: video_uuid (Aurora5 assinado) -> mp4 -> embed -> poster.

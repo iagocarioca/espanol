@@ -10,6 +10,8 @@ get_header();
 $espanol_term = get_queried_object();
 ?>
 
+<?php espanol_breadcrumbs(); ?>
+
 <header class="archive-header">
 	<h1 class="archive-title">
 		<?php
