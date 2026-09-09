@@ -11,6 +11,29 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Idioma declarado no <html>.
+ *
+ * O WordPress deriva o atributo lang do locale do site, que está em pt-BR
+ * enquanto todo o conteúdo é espanhol. Declarar o idioma errado faz o Google
+ * associar as páginas ao público errado, então o tema sobrescreve apenas o
+ * atributo — sem tocar no locale do admin nem na tradução da interface.
+ *
+ * @param string $output Atributos já montados pelo core (lang="…" etc).
+ * @return string Atributos com o lang corrigido.
+ */
+function espanol_html_lang( $output ) {
+	$lang = apply_filters( 'espanol_html_lang_value', 'es' );
+
+	if ( preg_match( '/lang="[^"]*"/', $output ) ) {
+		return preg_replace( '/lang="[^"]*"/', 'lang="' . esc_attr( $lang ) . '"', $output, 1 );
+	}
+
+	// Sem atributo lang (locale vazio): acrescenta.
+	return trim( $output . ' lang="' . esc_attr( $lang ) . '"' );
+}
+add_filter( 'language_attributes', 'espanol_html_lang' );
+
+/**
  * Canonical em arquivos e busca.
  *
  * O core do WordPress só emite canonical em is_singular(), então arquivos,

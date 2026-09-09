@@ -211,6 +211,9 @@ add_action( 'wp_head', 'espanol_schema_video', 5 );
 function espanol_open_graph() {
 	$site = get_bloginfo( 'name' );
 
+	// Locale do conteúdo, não o do WordPress (que está em pt-BR).
+	echo '<meta property="og:locale" content="' . esc_attr( apply_filters( 'espanol_og_locale', 'es_ES' ) ) . '">' . "\n";
+
 	if ( is_singular() ) {
 		$post_id = get_the_ID();
 		if ( ! $post_id ) {
