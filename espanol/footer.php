@@ -20,7 +20,13 @@ $espanol_twitter      = espanol_get_option( 'social_twitter' );
 	<div class="container">
 		<p class="footer-title"><?php echo esc_html( $espanol_footer_title ); ?></p>
 
-		<?php if ( $espanol_footer_desc ) : ?>
+		<?php
+		/*
+		 * Texto SEO apenas na home: repetido no site inteiro vira conteúdo
+		 * duplicado em todas as URLs e dilui o conteúdo real de cada página.
+		 */
+		if ( $espanol_footer_desc && ( is_front_page() || is_home() ) ) :
+			?>
 			<div class="footer-desc"><?php echo wp_kses_post( wpautop( $espanol_footer_desc ) ); ?></div>
 		<?php endif; ?>
 
