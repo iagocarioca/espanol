@@ -481,12 +481,13 @@ body.scheme-light .page-body { color: #3c414b; }
 
 /* ---------- Footer ---------- */
 .site-footer { background: #111; margin-top: 44px; padding: 34px 0 18px; }
-.footer-title { text-align: center; font-size: 22px; font-weight: 800; margin-bottom: 14px; }
-/* Texto corrido alinhado à esquerda: centralizar um parágrafo longo faz cada
-   linha começar num ponto diferente e o olho se perde na volta. */
-.footer-desc { color: var(--muted); font-size: 13.5px; line-height: 1.75; max-width: 68ch; margin: 0 auto 22px; text-align: left; }
-.footer-desc p { margin: 0 0 12px; }
+.footer-title { text-align: center; font-size: 22px; font-weight: 800; margin: 0 auto 14px; max-width: 860px; }
+/* Texto corrido: alinhado à esquerda para o olho não se perder na volta de
+   cada linha, mas na mesma coluna do título para o bloco não parecer torto. */
+.footer-desc { color: var(--muted); font-size: 13.5px; line-height: 1.7; max-width: 860px; margin: 0 auto 22px; text-align: left; }
+.footer-desc p { margin: 0 0 10px; }
 .footer-desc p:last-child { margin-bottom: 0; }
+.footer-desc + .footer-chips-wrap { margin-top: 26px; }
 .footer-chips-wrap { position: relative; max-width: 1140px; margin: 0 auto 22px; }
 .footer-chips {
 	display: flex; gap: 10px; overflow-x: auto; scroll-behavior: smooth;
