@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ESPANOL_VERSION', '1.4.0' );
+define( 'ESPANOL_VERSION', '1.4.1' );
 define( 'ESPANOL_DIR', get_template_directory() );
 define( 'ESPANOL_URI', get_template_directory_uri() );
 
@@ -91,6 +91,16 @@ function espanol_setup() {
 
 	add_image_size( 'espanol-thumb', 480, 270, true );
 	add_image_size( 'espanol-short', 360, 640, true );
+
+	/*
+	 * Variantes menores da thumb no mesmo 16:9.
+	 *
+	 * Sem elas o WordPress não tem alternativas para montar o srcset e serve
+	 * sempre a de 480px, mesmo num slot de ~330px. Registrar os intermediários
+	 * é o que permite ao navegador escolher a menor que sirva.
+	 */
+	add_image_size( 'espanol-thumb-sm', 240, 135, true );
+	add_image_size( 'espanol-thumb-md', 360, 203, true );
 
 	register_nav_menus(
 		array(

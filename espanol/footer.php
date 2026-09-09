@@ -115,7 +115,7 @@ $espanol_twitter      = espanol_get_option( 'social_twitter' );
 			<div class="auth-logo">
 				<?php $espanol_auth_logo = espanol_get_option( 'logo' ); ?>
 				<?php if ( $espanol_auth_logo ) : ?>
-					<img src="<?php echo esc_url( $espanol_auth_logo ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+					<img src="<?php echo esc_url( $espanol_auth_logo ); ?>"<?php echo espanol_img_dimensions( $espanol_auth_logo ); // phpcs:ignore WordPress.Security.EscapeOutput -- atributos já escapados. ?> alt="<?php bloginfo( 'name' ); ?>">
 				<?php else : ?>
 					<span class="logo-text"><span class="logo-x"><?php echo esc_html( mb_substr( get_bloginfo( 'name' ), 0, 1 ) ); ?></span><?php echo esc_html( mb_substr( get_bloginfo( 'name' ), 1 ) ); ?></span>
 				<?php endif; ?>

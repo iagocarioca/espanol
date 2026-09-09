@@ -11,6 +11,55 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Atributo sizes das thumbnails da grade.
+ *
+ * Sem sizes o navegador assume 100vw e baixa a maior variante do srcset, o que
+ * anula o ganho de ter variantes. Os valores espelham os breakpoints da grade
+ * em style.css: 5-6 colunas por padrão, 4 até 1200px, 3 até 900px, 2 até 600px.
+ *
+ * @param string $sizes Valor calculado pelo core.
+ * @param array  $size  Dimensões da imagem.
+ * @return string Valor ajustado.
+ */
+function espanol_thumb_sizes( $sizes, $size ) {
+	// Só as thumbs da grade (480x270 e variantes 16:9 menores).
+	if ( ! is_array( $size ) || empty( $size[0] ) || (int) $size[0] > 480 ) {
+		return $sizes;
+	}
+
+	return '(max-width: 600px) 50vw, (max-width: 900px) 33vw, (max-width: 1200px) 25vw, 260px';
+}
+add_filter( 'wp_calculate_image_sizes', 'espanol_thumb_sizes', 10, 2 );
+
+/**
+ * Atributos width/height de uma imagem da biblioteca, a partir da URL.
+ *
+ * Sem dimensões o navegador não reserva espaço antes do download e o layout
+ * salta quando a imagem chega (CLS). O logo é o caso mais visível, porque fica
+ * no topo e é uma das primeiras coisas a carregar.
+ *
+ * @param string $url URL da imagem.
+ * @return string ' width="X" height="Y"' ou vazio se não for possível descobrir.
+ */
+function espanol_img_dimensions( $url ) {
+	if ( ! $url ) {
+		return '';
+	}
+
+	$id = attachment_url_to_postid( $url );
+	if ( ! $id ) {
+		return '';
+	}
+
+	$meta = wp_get_attachment_metadata( $id );
+	if ( empty( $meta['width'] ) || empty( $meta['height'] ) ) {
+		return '';
+	}
+
+	return ' width="' . (int) $meta['width'] . '" height="' . (int) $meta['height'] . '"';
+}
+
+/**
  * Idioma declarado no <html>.
  *
  * O WordPress deriva o atributo lang do locale do site, que está em pt-BR

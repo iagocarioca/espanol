@@ -27,7 +27,7 @@ $espanol_stats = espanol_get_option( 'stats_text', 'Más de <span class="num">42
 		<button class="offcanvas-close js-menu-close" aria-label="<?php esc_attr_e( 'Cerrar menú', 'espanol' ); ?>"><?php espanol_the_icon( 'close' ); ?></button>
 		<a class="site-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<?php if ( $espanol_logo ) : ?>
-				<img src="<?php echo esc_url( $espanol_logo ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+				<img src="<?php echo esc_url( $espanol_logo ); ?>"<?php echo espanol_img_dimensions( $espanol_logo ); // phpcs:ignore WordPress.Security.EscapeOutput -- atributos já escapados. ?> alt="<?php bloginfo( 'name' ); ?>">
 			<?php else : ?>
 				<span class="logo-text"><span class="logo-x"><?php echo esc_html( mb_substr( get_bloginfo( 'name' ), 0, 1 ) ); ?></span><?php echo esc_html( mb_substr( get_bloginfo( 'name' ), 1 ) ); ?></span>
 			<?php endif; ?>
@@ -92,7 +92,7 @@ $espanol_stats = espanol_get_option( 'stats_text', 'Más de <span class="num">42
 
 				<a class="site-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<?php if ( $espanol_logo ) : ?>
-						<img src="<?php echo esc_url( $espanol_logo ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+						<img src="<?php echo esc_url( $espanol_logo ); ?>"<?php echo espanol_img_dimensions( $espanol_logo ); // phpcs:ignore WordPress.Security.EscapeOutput -- atributos já escapados. ?> alt="<?php bloginfo( 'name' ); ?>">
 					<?php else : ?>
 						<span class="logo-text"><span class="logo-x"><?php echo esc_html( mb_substr( get_bloginfo( 'name' ), 0, 1 ) ); ?></span><?php echo esc_html( mb_substr( get_bloginfo( 'name' ), 1 ) ); ?></span>
 					<?php endif; ?>
@@ -125,7 +125,7 @@ $espanol_stats = espanol_get_option( 'stats_text', 'Más de <span class="num">42
 							<span class="cta-label"><?php echo esc_html( $espanol_cta_text ); ?></span>
 						</a>
 					<?php else : ?>
-						<a class="btn-cta js-open-auth" href="<?php echo esc_url( wp_login_url() ); ?>">
+						<a class="btn-cta js-open-auth" href="<?php echo esc_url( wp_login_url() ); ?>" aria-label="<?php echo esc_attr( $espanol_cta_text ); ?>">
 							<?php espanol_the_icon( 'login' ); ?>
 							<span class="cta-label"><?php echo esc_html( $espanol_cta_text ); ?></span>
 						</a>
