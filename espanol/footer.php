@@ -188,6 +188,9 @@ $espanol_twitter      = espanol_get_option( 'social_twitter' );
 	</div>
 <?php endif; ?>
 
+<?php // Aviso 18+: no fim do <body> para o Google ler o conteúdo antes dele. ?>
+<?php get_template_part( 'template-parts/age-gate' ); ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>

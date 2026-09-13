@@ -19,7 +19,38 @@ $espanol_stats = espanol_get_option( 'stats_text', 'Más de <span class="num">42
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<?php get_template_part( 'template-parts/age-gate' ); ?>
+<?php
+/**
+ * Aviso 18+: aqui entra só a cortina; o painel com o texto está no fim do
+ * <body> (footer.php).
+ *
+ * O motivo da separação é o Google. Ele renderiza a página sem o cookie, vê o
+ * aviso cobrindo a tela inteira e usava aquele parágrafo como descrição do
+ * resultado no lugar da meta description — e, com o aviso no topo do HTML,
+ * toda página do site começava pelo mesmo texto. Com o painel no fim, a
+ * página começa pelo próprio conteúdo.
+ *
+ * O que sobra aqui não tem uma palavra: uma div vazia com style inline. Nada
+ * para um crawler ler, e nada que dependa de CSS — regra nova de CSS só chega
+ * ao visitante depois de purge, porque a Cloudflare ignora a query string na
+ * chave de cache e o `?ver=` do enqueue não invalida nada.
+ *
+ * A decisão continua saindo do cookie no client, nunca do PHP: o full-page
+ * cache guarda uma versão só da página para todo mundo.
+ */
+?>
+<script>
+(function () {
+	if (document.cookie.indexOf('espanol_age_ok=1') !== -1) return;
+
+	document.documentElement.style.overflow = 'hidden';
+
+	var veil = document.createElement('div');
+	veil.id = 'age-veil';
+	veil.setAttribute('style', 'position:fixed;inset:0;background:#000;z-index:9998');
+	document.body.appendChild(veil);
+})();
+</script>
 
 <div class="offcanvas-overlay js-menu-close"></div>
 <aside class="offcanvas" aria-label="<?php esc_attr_e( 'Menú principal', 'espanol' ); ?>">

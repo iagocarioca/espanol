@@ -6,6 +6,18 @@
  * `espanol_age_ok`, nunca no PHP, porque o full-page cache guardaria uma única
  * versão da página e serviria o gate (ou a ausência dele) para todo mundo.
  *
+ * Fica no FIM do <body> (footer.php), não no topo. O Googlebot renderiza a
+ * página sem o cookie, enxerga este painel cobrindo a tela e passava a usar o
+ * texto do aviso como descrição do resultado de busca, no lugar da meta
+ * description — em toda página do site, sempre o mesmo parágrafo. Quem cobre o
+ * primeiro frame é a cortina criada pelo script do header: uma div vazia, sem
+ * texto para indexar.
+ *
+ * O `data-nosnippet` é o cinto além do suspensório: mesmo que este texto volte
+ * a competir com a meta description, o Google fica proibido de usar o conteúdo
+ * desta div como snippet. Ele continua indexado — o atributo só governa o que
+ * aparece no resultado.
+ *
  * @package Espanol
  */
 
@@ -14,7 +26,7 @@ defined( 'ABSPATH' ) || exit;
 $espanol_gate_logo = espanol_get_option( 'logo' );
 ?>
 
-<div class="age-gate" id="age-gate">
+<div class="age-gate" id="age-gate" data-nosnippet>
 	<div class="age-gate-overlay"></div>
 
 	<div class="age-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
@@ -57,17 +69,39 @@ $espanol_gate_logo = espanol_get_option( 'logo' );
 
 <script>
 	(function () {
+		var root = document.documentElement;
 		var gate = document.getElementById('age-gate');
+		var veil = document.getElementById('age-veil');
 		if (!gate) return;
-		if (document.cookie.indexOf('espanol_age_ok=1') !== -1) return;
 
+		function release() {
+			if (veil) veil.remove();
+			document.body.classList.remove('modal-open');
+			root.style.overflow = '';
+		}
+
+		// O cookie pode ter aparecido depois do script do header — outra aba
+		// aceitou enquanto esta carregava. Sem liberar aqui, a página ficaria
+		// travada atrás de uma cortina que nunca vira painel.
+		if (document.cookie.indexOf('espanol_age_ok=1') !== -1) {
+			gate.remove();
+			release();
+			return;
+		}
+
+		// A cortina sai no mesmo frame em que o painel aparece: as duas juntas
+		// escureceriam em dobro, e o fundo do painel precisa enxergar a página,
+		// não uma camada preta por cima dela. A trava da rolagem fica — inline,
+		// além do `modal-open`, porque o script do header não depende de CSS.
 		gate.classList.add('is-open');
 		document.body.classList.add('modal-open');
+		root.style.overflow = 'hidden';
+		if (veil) veil.remove();
 
 		gate.querySelector('[data-age-accept]').addEventListener('click', function () {
 			document.cookie = 'espanol_age_ok=1;path=/;max-age=604800;samesite=lax';
 			gate.remove();
-			document.body.classList.remove('modal-open');
+			release();
 		});
 	})();
 </script>
