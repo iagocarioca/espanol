@@ -13,10 +13,14 @@
  * primeiro frame é a cortina criada pelo script do header: uma div vazia, sem
  * texto para indexar.
  *
- * O `data-nosnippet` é o cinto além do suspensório: mesmo que este texto volte
- * a competir com a meta description, o Google fica proibido de usar o conteúdo
- * desta div como snippet. Ele continua indexado — o atributo só governa o que
- * aparece no resultado.
+ * Este painel fica dentro de um <template>: ali o markup é inerte, não é
+ * renderizado nem lido como texto da página, então some do HTML servido. O JS
+ * clona e insere no DOMContentLoaded, e só para quem não tem o cookie.
+ *
+ * O `data-nosnippet` não é redundância do <template>: o Googlebot não tem cookie,
+ * recebe o clone e lê o texto no DOM renderizado. É o atributo que proíbe o
+ * Google de usar este texto como descrição do resultado; o <template> só reduz a
+ * superfície no HTML servido e nos crawlers que não executam JS.
  *
  * @package Espanol
  */
@@ -26,6 +30,7 @@ defined( 'ABSPATH' ) || exit;
 $espanol_gate_logo = espanol_get_option( 'logo' );
 ?>
 
+<template id="ageGateTemplate">
 <div class="age-gate" id="age-gate" data-nosnippet>
 	<div class="age-gate-overlay"></div>
 
@@ -66,42 +71,65 @@ $espanol_gate_logo = espanol_get_option( 'logo' );
 		</div>
 	</div>
 </div>
+</template>
 
 <script>
 	(function () {
 		var root = document.documentElement;
-		var gate = document.getElementById('age-gate');
-		var veil = document.getElementById('age-veil');
-		if (!gate) return;
+		var gate = null;
 
+		// Toda saída passa por aqui. Sem isso, qualquer falha deixaria o visitante
+		// preso atrás da cortina preta: página travada e nada para clicar.
 		function release() {
+			var veil = document.getElementById('age-veil');
+			if (gate) gate.remove();
 			if (veil) veil.remove();
 			document.body.classList.remove('modal-open');
 			root.style.overflow = '';
 		}
 
-		// O cookie pode ter aparecido depois do script do header — outra aba
-		// aceitou enquanto esta carregava. Sem liberar aqui, a página ficaria
-		// travada atrás de uma cortina que nunca vira painel.
-		if (document.cookie.indexOf('espanol_age_ok=1') !== -1) {
-			gate.remove();
-			release();
-			return;
+		function start() {
+			// O cookie pode ter aparecido depois do script do header — outra aba
+			// aceitou enquanto esta carregava.
+			if (document.cookie.indexOf('espanol_age_ok=1') !== -1) return release();
+
+			var tpl = document.getElementById('ageGateTemplate');
+			if (!tpl || !tpl.content) return release();
+
+			// O painel só entra no DOM aqui. Dentro do <template> o markup é inerte:
+			// não é renderizado nem lido como texto da página, então some do HTML
+			// servido. O `data-nosnippet` na div continua valendo — depois do clone o
+			// texto está no DOM vivo, e é o DOM renderizado que o Googlebot lê.
+			var frag = tpl.content.cloneNode(true);
+			gate = frag.querySelector('#age-gate');
+			var accept = gate && gate.querySelector('[data-age-accept]');
+			if (!accept) return release();
+
+			// Abrir antes de inserir: assim o painel nunca chega a pintar fechado.
+			gate.classList.add('is-open');
+			document.body.appendChild(frag);
+			document.body.classList.add('modal-open');
+			root.style.overflow = 'hidden';
+
+			// A cortina sai no mesmo frame em que o painel entra: as duas juntas
+			// escureceriam em dobro, e o fundo do painel precisa enxergar a página,
+			// não uma camada preta por cima dela. A trava da rolagem fica.
+			var veil = document.getElementById('age-veil');
+			if (veil) veil.remove();
+
+			accept.addEventListener('click', function () {
+				document.cookie = 'espanol_age_ok=1;path=/;max-age=604800;samesite=lax';
+				release();
+			});
 		}
 
-		// A cortina sai no mesmo frame em que o painel aparece: as duas juntas
-		// escureceriam em dobro, e o fundo do painel precisa enxergar a página,
-		// não uma camada preta por cima dela. A trava da rolagem fica — inline,
-		// além do `modal-open`, porque o script do header não depende de CSS.
-		gate.classList.add('is-open');
-		document.body.classList.add('modal-open');
-		root.style.overflow = 'hidden';
-		if (veil) veil.remove();
-
-		gate.querySelector('[data-age-accept]').addEventListener('click', function () {
-			document.cookie = 'espanol_age_ok=1;path=/;max-age=604800;samesite=lax';
-			gate.remove();
-			release();
-		});
+		// O `readyState` é a trava de segurança: se o DOMContentLoaded já tiver
+		// disparado, o listener nunca chamaria start() e a cortina ficaria para
+		// sempre. Aqui no fim do <body> o estado é `loading`, então espera o evento.
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', start);
+		} else {
+			start();
+		}
 	})();
 </script>
